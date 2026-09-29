@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ÉLÉGANCE — Haute Couture & Bespoke Atelier</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+          colors: {
+            noir: '#050505',
+            charcoal: '#111111',
+            cream: '#FAF9F6',
+            champagne: '#D4AF37',
+            champagneHover: '#AA8C2C',
+            error: '#9D2B2B',
+          },
+          letterSpacing: {
+            widestPlus: '0.2em',
+            ultra: '0.3em',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* UX/UI Refinements */
+    body {
+      background-color: #050505;
+      color: #FAF9F6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    ::selection { background: #D4AF37; color: #050505; }
+    
+    /* Elegant Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+    /* Minimalist Glassmorphism */
+    .glass-panel {
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Form Input Underline Animation */
+    .input-field {
+      border-bottom: 1px solid #333;
+      transition: all 0.3s ease;
+    }
+    .input-field:focus {
+      border-bottom-color: #D4AF37;
+      box-shadow: 0 1px 0 0 #D4AF37;
+    }
+
+    /* Subtle Image Reveal */
+    .img-reveal {
+      filter: grayscale(80%) contrast(1.1);
+      transition: filter 0.7s ease, transform 0.7s ease;
+    }
+    .group:hover .img-reveal {
+      filter: grayscale(0%) contrast(1);
+      transform: scale(1.03);
+    }
+
+    /* HUD Minimized State */
+    #liveEventsHUD {
+      transform: translateY(calc(100% - 40px));
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #liveEventsHUD.hud-open {
+      transform: translateY(0);
+    }
+
+    /* Drag & Drop Styles */
+    .draggable-item { cursor: grab; }
+    .draggable-item:active { cursor: grabbing; }
+    .dropzone-hover {
+      border-color: #D4AF37 !important;
+      background: rgba(212, 175, 55, 0.05) !important;
+    }
+
+    /* Toast Animation */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-enter { animation: slideUp 0.3s ease forwards; }
+  </style>
+</head>
+
+<body class="relative overflow-x-hidden">
+
+  <div id="scrollProgressBar" class="fixed top-0 left-0 h-[1px] bg-champagne z-50 transition-all duration-75 w-0"></div>
+
+  <header id="mainHeader" class="fixed top-0 w-full z-40 transition-all duration-500 glass-panel border-b-0 py-5 px-8 md:px-16 flex items-center justify-between">
+    <!-- Brand -->
+    <a href="#hero" class="group flex flex-col items-center cursor-pointer">
+      <span class="font-serif text-2xl md:text-3xl tracking-widestPlus uppercase text-cream group-hover:text-champagne transition-colors duration-500">Élégance</span>
+      <span class="text-[8px] uppercase tracking-ultra text-stone-400 mt-1">Paris</span>
+    </a>
+
+    <!-- Nav -->
+    <nav class="hidden md:flex items-center space-x-12 text-[10px] uppercase tracking-widest text-stone-400">
+      <a href="#collection" class="hover:text-cream transition-colors duration-300">Archive</a>
+      <a href="#lookbook" class="hover:text-cream transition-colors duration-300">Runway</a>
+      <a href="#bespoke" class="hover:text-champagne transition-colors duration-300">Bespoke Tailoring</a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center space-x-6 text-sm">
+      <div class="relative hidden lg:block group">
+        <input type="text" id="searchInput" placeholder="Search archive (/)" class="bg-transparent border-b border-stone-800 text-[10px] px-2 py-1 text-cream placeholder-stone-600 focus:outline-none focus:border-champagne w-32 focus:w-48 transition-all duration-500 uppercase tracking-widest" />
+        <i data-lucide="search" class="w-3 h-3 text-stone-600 absolute right-0 top-1.5 group-focus-within:text-champagne transition-colors"></i>
+      </div>
+      <button id="cartBtn" class="text-stone-400 hover:text-cream transition-colors relative">
+        <span class="text-[10px] uppercase tracking-widest mr-1 hidden sm:inline-block">Bag</span>
+        <span id="cartCount" class="absolute -top-2 -right-3 text-[9px] bg-champagne text-noir w-4 h-4 rounded-full flex items-center justify-center font-medium">0</span>
+      </button>
+    </div>
+  </header>
+
+  <section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden px-8">
+    <div id="spotlight" class="absolute inset-0 pointer-events-none opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.08),transparent_40%)]"></div>
+    
+    <div class="relative z-10 text-center flex flex-col items-center max-w-4xl mt-16">
+      <span class="text-[9px] uppercase tracking-ultra text-champagne mb-8 tracking-widestPlus">Automne / Hiver 2026</span>
+      <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-light tracking-wide leading-[1.1] text-cream mb-8">
+        The Architecture<br><span class="italic text-stone-400">of Silence</span>
+      </h1>
+      <p class="text-xs md:text-sm text-stone-400 font-light tracking-widest max-w-lg leading-relaxed mb-12">
+        Immerse yourself in precision. A digital curation of handcrafted garments responding intimately to every digital interaction.
+      </p>
+      <a href="#collection" class="text-[10px] uppercase tracking-widestPlus text-cream border-b border-champagne pb-1 hover:text-champagne transition-colors duration-300">
+        Discover the Archive
+      </a>
+    </div>
+  </section>
+
+  <section id="collection" class="py-32 px-8 md:px-16 max-w-[1400px] mx-auto border-t border-stone-900">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+      <div>
+        <h2 class="font-serif text-3xl md:text-4xl font-light text-cream mb-2">Curated Silhouettes</h2>
+        <p class="text-[10px] uppercase tracking-widest text-stone-500">Double-click to adore • Right-click for VIP</p>
+      </div>
+      
+      <div class="flex space-x-6 text-[10px] uppercase tracking-widest text-stone-400">
+        <select id="sortFilter" class="bg-transparent border-b border-stone-800 pb-1 focus:outline-none focus:border-champagne cursor-pointer">
+          <option value="all">Sort: Editorial</option>
+          <option value="price-asc">Sort: Price Asc</option>
+          <option value="price-desc">Sort: Price Desc</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-x-12 md:gap-y-24">
+      <!-- Products injected via JS -->
+    </div>
+  </section>
+
+  <section id="lookbook" class="py-32 border-t border-stone-900 bg-[#080808]">
+    <div class="px-8 md:px-16 max-w-[1400px] mx-auto mb-16 flex justify-between items-end">
+      <div>
+        <h2 class="font-serif text-3xl font-light text-cream mb-2">The Runway Horizon</h2>
+        <p class="text-[10px] uppercase tracking-widest text-stone-500">Scroll horizontally</p>
+      </div>
+    </div>
+    
+    <div id="runwayStrip" class="overflow-x-auto flex space-x-8 px-8 md:px-16 pb-12 cursor-ew-resize no-scrollbar">
+      <!-- Runway cards generated via JS -->
+    </div>
+  </section>
+
+  <section id="bespoke" class="py-32 px-8 md:px-16 max-w-5xl mx-auto border-t border-stone-900">
+    <div class="text-center mb-20">
+      <span class="text-[9px] uppercase tracking-ultra text-champagne mb-4 block">Private Commission</span>
+      <h2 class="font-serif text-4xl md:text-5xl font-light text-cream mb-6">Bespoke Tailoring</h2>
+      <p class="text-xs text-stone-400 font-light max-w-xl mx-auto leading-relaxed">
+        Submit your precise measurements to commission a custom garment from our Paris atelier. Measurements are strictly validated for architectural perfection.
+      </p>
+    </div>
+
+    <form id="bespokeForm" class="max-w-2xl mx-auto space-y-12 bg-[#080808] p-8 md:p-12 border border-stone-900/50">
+      
+      <!-- Standard Size -->
+      <div class="relative group">
+        <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Standard Base Size</label>
+        <input type="text" id="sizeInput" placeholder="XS, S, M, L, XL, XXL, XXXL" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800" />
+        <p id="sizeError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Invalid size format.</p>
+        <p class="absolute top-0 right-0 text-[9px] text-stone-600 font-mono">Regex: ^(XS|S|M|L|XL|XXL|XXXL)$</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-4">
+        <!-- Chest -->
+        <div class="relative group">
+          <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Chest (Inches)</label>
+          <input type="text" id="chestInput" placeholder="e.g. 34.50" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800 measurement-input" data-min="25" data-max="65" />
+          <p id="chestError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Error msg</p>
+          <span class="absolute right-0 bottom-3 text-[10px] text-stone-700">25 - 65"</span>
+        </div>
+
+        <!-- Waist -->
+        <div class="relative group">
+          <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Waist (Inches)</label>
+          <input type="text" id="waistInput" placeholder="e.g. 28.00" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800 measurement-input" data-min="20" data-max="60" />
+          <p id="waistError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Error msg</p>
+          <span class="absolute right-0 bottom-3 text-[10px] text-stone-700">20 - 60"</span>
+        </div>
+
+        <!-- Hips -->
+        <div class="relative group">
+          <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Hips (Inches)</label>
+          <input type="text" id="hipsInput" placeholder="e.g. 36.25" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800 measurement-input" data-min="30" data-max="70" />
+          <p id="hipsError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Error msg</p>
+          <span class="absolute right-0 bottom-3 text-[10px] text-stone-700">30 - 70"</span>
+        </div>
+
+        <!-- Sleeve Length -->
+        <div class="relative group">
+          <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Sleeve Length (Inches)</label>
+          <input type="text" id="sleeveInput" placeholder="e.g. 32.5" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800 measurement-input" data-min="20" data-max="40" />
+          <p id="sleeveError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Error msg</p>
+          <span class="absolute right-0 bottom-3 text-[10px] text-stone-700">20 - 40"</span>
+        </div>
+
+        <!-- Inseam -->
+        <div class="relative group">
+          <label class="block text-[10px] uppercase tracking-widest text-stone-500 mb-2">Inseam (Inches)</label>
+          <input type="text" id="inseamInput" placeholder="e.g. 30.00" class="w-full bg-transparent input-field text-cream py-2 text-sm focus:outline-none placeholder-stone-800 measurement-input" data-min="25" data-max="45" />
+          <p id="inseamError" class="absolute -bottom-5 left-0 text-[9px] text-error hidden tracking-wider">Error msg</p>
+          <span class="absolute right-0 bottom-3 text-[10px] text-stone-700">25 - 45"</span>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col items-center">
+        <button type="submit" class="border border-champagne text-champagne hover:bg-champagne hover:text-noir px-12 py-4 text-[10px] uppercase tracking-widestPlus transition-all duration-300 w-full md:w-auto">
+          Submit Commission Request
+        </button>
+        <p class="text-[9px] text-stone-600 font-mono mt-4">Validates via: ^\d+(\.\d{1,2})?$</p>
+      </div>
+    </form>
+  </section>
+
+  <section id="moodboard" class="py-32 border-t border-stone-900 bg-[#050505] px-8 md:px-16">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-12">
+      <div class="md:w-1/3">
+        <h2 class="font-serif text-3xl font-light text-cream mb-4">Stylist Studio</h2>
+        <p class="text-xs text-stone-400 font-light mb-8">Drag fabrics to the canvas to conceptualize.</p>
+        <div class="space-y-4">
+          <div class="draggable-item text-[10px] uppercase tracking-widest border border-stone-800 p-4 text-stone-300 hover:border-champagne/50" draggable="true" data-material="Black Silk Organza">Black Silk Organza</div>
+          <div class="draggable-item text-[10px] uppercase tracking-widest border border-stone-800 p-4 text-stone-300 hover:border-champagne/50" draggable="true" data-material="Gold Bullion Threading">Gold Bullion Threading</div>
+          <div class="draggable-item text-[10px] uppercase tracking-widest border border-stone-800 p-4 text-stone-300 hover:border-champagne/50" draggable="true" data-material="Midnight Velvet">Midnight Velvet</div>
+        </div>
+      </div>
+      
+      <div class="md:w-2/3">
+        <div id="dropzone" class="h-64 border border-dashed border-stone-800 flex flex-col items-center justify-center p-8 transition-colors duration-300 relative">
+          <span class="text-[10px] uppercase tracking-widest text-stone-600 pointer-events-none absolute" id="dropPlaceholder">Drop materials here</span>
+          <div id="droppedItems" class="w-full flex flex-wrap gap-3 z-10"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-stone-900 bg-[#030303] py-20 px-8 md:px-16 text-center md:text-left">
+    <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+      <div>
+        <span class="font-serif text-2xl tracking-widestPlus uppercase text-cream">Élégance</span>
+        <p class="text-[10px] uppercase tracking-widest text-stone-600 mt-4">Paris, France</p>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-stone-400 font-serif italic text-sm md:text-base select-all cursor-text" id="quoteText" title="Copy to trigger event">
+          "Architecture is the art of how to waste space; fashion is the art of how to waste time elegantly."
+        </p>
+        <span class="text-[8px] uppercase tracking-widest text-champagne mt-2 block">Highlight & Copy</span>
+      </div>
+
+      <div class="md:text-right font-mono text-[9px] text-stone-600 space-y-2">
+        <div>Viewport: <span id="viewportReadout" class="text-stone-400"></span></div>
+        <div>DOM Events Tracked: <span class="text-champagne">20</span></div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="liveEventsHUD" class="fixed bottom-0 right-4 md:right-8 z-50 w-72 glass-panel border border-stone-800 rounded-t-lg shadow-2xl flex flex-col h-[300px]">
+    <!-- HUD Header Tab -->
+    <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between cursor-pointer group bg-[#0a0a0a] rounded-t-lg" id="hudToggleBtn">
+      <div class="flex items-center space-x-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-champagne animate-pulse"></span>
+        <span class="text-[9px] uppercase font-mono tracking-widest text-stone-300 group-hover:text-champagne transition-colors">Event Console</span>
+      </div>
+      <i data-lucide="chevron-up" id="hudIcon" class="w-3 h-3 text-stone-500 transition-transform duration-300"></i>
+    </div>
+    
+    <!-- HUD Body -->
+    <div class="flex-1 overflow-y-auto p-3 space-y-2 font-mono text-[9px] bg-[#050505]/90" id="hudLog">
+      <div class="text-stone-600 text-center py-4">Awaiting interactions...</div>
+    </div>
+  </div>
+
+  <!-- VIP Context Menu -->
+  <div id="vipMenu" class="hidden fixed z-50 glass-panel border border-stone-800 p-1 rounded min-w-[160px] shadow-2xl text-[10px] uppercase tracking-widest font-mono">
+    <div class="px-4 py-2 border-b border-stone-800 text-champagne mb-1">VIP Services</div>
+    <button class="w-full text-left px-4 py-2 hover:bg-white/5 text-stone-300 transition-colors">Request Fabric</button>
+    <button class="w-full text-left px-4 py-2 hover:bg-white/5 text-stone-300 transition-colors">Atelier Fitting</button>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-24 right-8 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+  <script>
+    // --- Data & State ---
+    const PRODUCTS = [
+      { id: 1, title: "L'Ombre Noir Gown", price: 8200, img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=600&q=80", type: "evening" },
+      { id: 2, title: "Architectural Tuxedo", price: 5400, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80", type: "tailoring" },
+      { id: 3, title: "Gold Bullion Cape", price: 12000, img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=600&q=80", type: "evening" },
+      { id: 4, title: "Ivory Column Dress", price: 6800, img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80", type: "evening" },
+      { id: 5, title: "Structured Trench", price: 4200, img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=600&q=80", type: "tailoring" },
+      { id: 6, title: "Quartz Minaudière", price: 2900, img: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80", type: "accessory" }
+    ];
+
+    const state = { cart: 0, logCount: 0 };
+
+    // --- DOM Elements ---
+    const hudLog = document.getElementById("hudLog");
+    const toastContainer = document.getElementById("toastContainer");
+
+    // --- Core Functions ---
+    function logEvent(type, targetStr) {
+      state.logCount++;
+      const time = new Date().toISOString().substring(11, 23); // HH:MM:SS.mmm
+      
+      if (state.logCount === 1) hudLog.innerHTML = ""; // Clear empty msg
+      
+      const entry = document.createElement("div");
+      entry.className = "flex items-start justify-between border-b border-stone-900 pb-1";
+      entry.innerHTML = `
+        <div class="truncate max-w-[160px]">
+          <span class="text-champagne font-bold mr-2">${type}</span>
+          <span class="text-stone-500">${targetStr}</span>
+        </div>
+        <span class="text-stone-700 ml-2 whitespace-nowrap">${time}</span>
+      `;
+      hudLog.prepend(entry);
+      
+      if (hudLog.children.length > 30) hudLog.removeChild(hudLog.lastChild);
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement("div");
+      toast.className = "glass-panel border border-champagne/30 text-cream text-[10px] uppercase tracking-widest px-6 py-4 toast-enter";
+      toast.innerHTML = `<span class="text-champagne mr-2">✦</span> ${msg}`;
+      toastContainer.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-10px)";
+        toast.style.transition = "all 0.4s ease";
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    // --- UI Renderers ---
+    function renderProducts(items) {
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = items.map(p => `
+        <div class="group cursor-pointer flex flex-col product-card" data-id="${p.id}" data-title="${p.title}">
+          <div class="relative overflow-hidden aspect-[3/4] mb-6 bg-[#0a0a0a]">
+            <img src="${p.img}" alt="${p.title}" class="w-full h-full object-cover img-reveal" loading="lazy">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center backdrop-blur-[2px]">
+              <button class="add-to-bag text-[9px] uppercase tracking-widestPlus border border-champagne text-champagne px-6 py-3 hover:bg-champagne hover:text-noir transition-colors duration-300">
+                Commission
+              </button>
+            </div>
+            <!-- Heart icon for dblclick feedback -->
+            <i data-lucide="heart" class="absolute top-4 right-4 w-5 h-5 text-champagne opacity-0 transition-opacity duration-300 fav-icon"></i>
+          </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-serif text-xl text-cream tracking-wide group-hover:text-champagne transition-colors">${p.title}</h3>
+              <p class="text-[9px] uppercase tracking-widest text-stone-500 mt-1">${p.type}</p>
+            </div>
+            <span class="font-serif text-sm text-stone-400">€ ${p.price.toLocaleString()}</span>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+      attachProductEvents();
+    }
+
+    function renderRunway() {
+      const strip = document.getElementById("runwayStrip");
+      const images = PRODUCTS.map(p => p.img).reverse();
+      strip.innerHTML = images.map((img, i) => `
+        <div class="flex-shrink-0 w-64 md:w-80 h-96 overflow-hidden">
+          <img src="${img}" class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" alt="Runway ${i}">
+        </div>
+      `).join('');
+    }
+
+    // --- Validation Logic (Regex & Min/Max) ---
+    function showError(inputEl, errorEl, msg) {
+      errorEl.innerText = msg;
+      errorEl.classList.remove("hidden");
+      inputEl.style.borderBottomColor = "#9D2B2B";
+    }
+
+    function clearError(inputEl, errorEl) {
+      errorEl.classList.add("hidden");
+      inputEl.style.borderBottomColor = "";
+    }
+
+    function validateSize(inputEl) {
+      const val = inputEl.value.trim().toUpperCase();
+      const errorEl = document.getElementById("sizeError");
+      const regex = /^(XS|S|M|L|XL|XXL|XXXL)$/;
+      
+      if (!val) { clearError(inputEl, errorEl); return false; }
+      
+      if (!regex.test(val)) {
+        showError(inputEl, errorEl, "Must be XS, S, M, L, XL, XXL, or XXXL.");
+        return false;
+      }
+      clearError(inputEl, errorEl);
+      return true;
+    }
+
+    function validateMeasurement(inputEl) {
+      const val = inputEl.value.trim();
+      const errorEl = document.getElementById(inputEl.id.replace("Input", "Error"));
+      const min = parseFloat(inputEl.getAttribute("data-min"));
+      const max = parseFloat(inputEl.getAttribute("data-max"));
+      
+      // Regex: Optional decimals up to 2 places
+      const regex = /^\d+(\.\d{1,2})?$/;
+
+      if (!val) { clearError(inputEl, errorEl); return false; }
+
+      if (!regex.test(val)) {
+        showError(inputEl, errorEl, "Format: Numbers only, max 2 decimals.");
+        return false;
+      }
+
+      const num = parseFloat(val);
+      if (num < min || num > max) {
+        showError(inputEl, errorEl, `Out of range: Must be ${min} to ${max}.`);
+        return false;
+      }
+
+      clearError(inputEl, errorEl);
+      return true;
+    }
+
+    // --- 20 Monitored Events Setup ---
+    function initializeEvents() {
+      
+      // 1. scroll: Update progress bar & log
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement;
+        const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+        document.getElementById("scrollProgressBar").style.width = `${pct}%`;
+        if (Math.random() > 0.95) logEvent("scroll", `${Math.round(pct)}%`); // throttle log
+      });
+
+      // 2. resize: Track viewport
+      const vpReadout = document.getElementById("viewportReadout");
+      const updateVp = () => { vpReadout.innerText = `${window.innerWidth} x ${window.innerHeight}`; };
+      window.addEventListener("resize", () => {
+        updateVp();
+        logEvent("resize", vpReadout.innerText);
+      });
+      updateVp();
+
+      // 3. mousemove: Hero spotlight
+      const hero = document.getElementById("hero");
+      const spotlight = document.getElementById("spotlight");
+      hero.addEventListener("mousemove", (e) => {
+        const r = hero.getBoundingClientRect();
+        spotlight.style.background = `radial-gradient(circle at ${e.clientX - r.left}px ${e.clientY - r.top}px, rgba(212,175,55,0.08) 0%, transparent 40%)`;
+        if(Math.random() > 0.98) logEvent("mousemove", "Spotlight"); // throttle
+      });
+
+      // 4. keydown: Esc for custom menu, / for search
+      window.addEventListener("keydown", (e) => {
+        logEvent("keydown", e.key);
+        if (e.key === "Escape") document.getElementById("vipMenu").style.display = "none";
+        if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
+          e.preventDefault();
+          document.getElementById("searchInput").focus();
+        }
+      });
+
+      // 5. keyup: Search typing
+      document.getElementById("searchInput").addEventListener("keyup", (e) => {
+        logEvent("keyup", e.target.value || "empty");
+      });
+
+      // 6. change: Select sort
+      document.getElementById("sortFilter").addEventListener("change", (e) => {
+        logEvent("change", e.target.value);
+        const val = e.target.value;
+        let sorted = [...PRODUCTS];
+        if (val === "price-asc") sorted.sort((a,b) => a.price - b.price);
+        if (val === "price-desc") sorted.sort((a,b) => b.price - a.price);
+        renderProducts(sorted);
+      });
+
+      // 7. click: Toggle HUD
+      const hud = document.getElementById("liveEventsHUD");
+      const hudIcon = document.getElementById("hudIcon");
+      document.getElementById("hudToggleBtn").addEventListener("click", () => {
+        hud.classList.toggle("hud-open");
+        hudIcon.style.transform = hud.classList.contains("hud-open") ? "rotate(180deg)" : "rotate(0deg)";
+        logEvent("click", "HUD Toggle");
+      });
+
+      // 8. copy: Quote
+      document.getElementById("quoteText").addEventListener("copy", () => {
+        logEvent("copy", "Editorial Quote");
+        showToast("Quote copied to clipboard.");
+      });
+
+      // 9. wheel: Horizontal Runway
+      const runway = document.getElementById("runwayStrip");
+      runway.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        runway.scrollLeft += e.deltaY;
+        logEvent("wheel", `Runway scroll`);
+      });
+
+      // Drag & Drop Setup (Events 10, 11, 12)
+      const draggables = document.querySelectorAll(".draggable-item");
+      const dropzone = document.getElementById("dropzone");
+      const droppedItems = document.getElementById("droppedItems");
+      const dropPlaceholder = document.getElementById("dropPlaceholder");
+
+      draggables.forEach(item => {
+        // 10. dragstart
+        item.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", e.target.getAttribute("data-material"));
+          logEvent("dragstart", item.innerText);
+        });
+      });
+
+      // 11. dragover
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("dropzone-hover");
+        if(Math.random() > 0.95) logEvent("dragover", "Moodboard");
+      });
+
+      dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dropzone-hover"));
+
+      // 12. drop
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("dropzone-hover");
+        const material = e.dataTransfer.getData("text/plain");
+        if (material) {
+          dropPlaceholder.style.display = "none";
+          const badge = document.createElement("div");
+          badge.className = "text-[9px] uppercase tracking-widest border border-champagne text-champagne px-3 py-1 bg-champagne/5";
+          badge.innerText = material;
+          droppedItems.appendChild(badge);
+          logEvent("drop", material);
+          showToast(`${material} added to layout.`);
+        }
+      });
+
+      setupBespokeFormEvents();
+    }
+
+    function setupBespokeFormEvents() {
+      const sizeInput = document.getElementById("sizeInput");
+      const measurements = document.querySelectorAll(".measurement-input");
+      const form = document.getElementById("bespokeForm");
+
+      // 13. focus & 14. blur & 15. input : Bespoke Form
+      const allInputs = [sizeInput, ...measurements];
+      
+      allInputs.forEach(input => {
+        input.addEventListener("focus", (e) => logEvent("focus", e.target.id));
+        input.addEventListener("blur", (e) => {
+          logEvent("blur", e.target.id);
+          if (e.target.id === "sizeInput") validateSize(e.target);
+          else validateMeasurement(e.target);
+        });
+        input.addEventListener("input", (e) => {
+          logEvent("input", e.target.value);
+          // Real-time validation UX
+          if (e.target.id === "sizeInput") validateSize(e.target);
+          else validateMeasurement(e.target);
+        });
+      });
+
+      // 16. submit: Form Validation and Submission
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        logEvent("submit", "Bespoke Form");
+        
+        const isSizeValid = validateSize(sizeInput);
+        let areMeasurementsValid = true;
+        measurements.forEach(m => {
+          if (!validateMeasurement(m)) areMeasurementsValid = false;
+        });
+
+        if (isSizeValid && areMeasurementsValid) {
+          showToast("Commission request validated and submitted to Paris Atelier.");
+          form.reset();
+        } else {
+          showToast("Please correct the highlighted measurements.");
+        }
+      });
+    }
+
+    function attachProductEvents() {
+      const cards = document.querySelectorAll(".product-card");
+      const menu = document.getElementById("vipMenu");
+
+      cards.forEach(card => {
+        const title = card.getAttribute("data-title");
+
+        // 17. mouseenter
+        card.addEventListener("mouseenter", () => logEvent("mouseenter", title));
+        
+        // 18. mouseleave
+        card.addEventListener("mouseleave", () => logEvent("mouseleave", title));
+
+        // 19. dblclick
+        card.addEventListener("dblclick", (e) => {
+          e.preventDefault();
+          logEvent("dblclick", title);
+          const icon = card.querySelector(".fav-icon");
+          icon.style.opacity = "1";
+          icon.classList.add("fill-champagne");
+          showToast(`${title} added to favorites.`);
+        });
+
+        // 20. contextmenu (Custom VIP menu)
+        card.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          logEvent("contextmenu", title);
+          menu.style.display = "block";
+          menu.style.left = `${e.pageX}px`;
+          menu.style.top = `${e.pageY}px`;
+        });
+
+        // Click handler for add to bag
+        const btn = card.querySelector(".add-to-bag");
+        if(btn) {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            state.cart++;
+            document.getElementById("cartCount").innerText = state.cart;
+            logEvent("click", `Commission ${title}`);
+            showToast(`${title} added to bespoke bag.`);
+          });
+        }
+      });
+
+      // Hide menu on document click
+      document.addEventListener("click", (e) => {
+        if(menu.style.display === "block") {
+          menu.style.display = "none";
+        }
+      });
+    }
+
+    // --- Boot ---
+    window.addEventListener("DOMContentLoaded", () => {
+      renderProducts(PRODUCTS);
+      renderRunway();
+      initializeEvents();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
